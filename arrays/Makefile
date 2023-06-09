@@ -1,15 +1,23 @@
-TARGET=f3
-FILE=ar
-
-all: $(TARGET)
+FILE = ar
+TARGET ?= f1
 
 CHECKS=--bounds-check --pointer-check \
        --memory-cleanup-check --div-by-zero-check --signed-overflow-check \
        --pointer-overflow-check --conversion-check \
        --undefined-shift-check --enum-range-check --pointer-primitive-check
 
+all: clean $(TARGET)
 
-$(TARGET): $(FILE)_contracts.goto
+f1: $(FILE)_contracts.goto results
+	echo "Target was $(TARGET)"
+f2: $(FILE)_contracts.goto results
+	echo "Target was $(TARGET)"
+f3: $(FILE)_contracts.goto results
+	echo "Target was $(TARGET)"
+arsum: $(FILE)_contracts.goto results
+	echo "Target was $(TARGET)"
+
+results: $(FILE)_contracts.goto
 	cbmc --verbosity 6 $(CHECKS) --external-sat-solver cadical $<
 
 $(FILE)_contracts.goto: $(FILE).goto
