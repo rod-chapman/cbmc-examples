@@ -27,6 +27,8 @@ __CPROVER_requires(__CPROVER_is_fresh(s, sizeof(st)))
 __CPROVER_assigns(__CPROVER_object_whole(s));
 
 #define BLOCK_SIZE 4
+
+// 32-bit unsigned sum of data[0 .. num_blocks * BLOCK_SIZE - 1]
 uint32_t arsum(const uint8_t *data, size_t num_blocks)
 __CPROVER_requires(num_blocks >= 1)
 __CPROVER_requires(__CPROVER_is_fresh(data, num_blocks * BLOCK_SIZE));
