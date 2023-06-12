@@ -51,16 +51,12 @@ uint32_t arsum(const uint8_t *data, size_t num_blocks)
 
 
     // Inclusion of this assertion causes a crash in goto-instrument 5.84
-    __CPROVER_assert(__CPROVER_pointer_in_range_dfcc(data, current_byte_ptr, last_byte_ptr), "Oops");
+    __CPROVER_assert(__CPROVER_pointer_in_range(data, current_byte_ptr, last_byte_ptr), "Oops");
 
     for(; num_blocks--;)
     __CPROVER_assigns(num_blocks, sum, current_byte_ptr)
     __CPROVER_loop_invariant(num_blocks > 0)
-
-    // Should this also be a loop invariant???
-    // If I de-comment the next line of code, then goto-cc says
-    //   "Loop invariant is not side-effect free" - not sure why?!?
-    // __CPROVER_loop_invariant(__CPROVER_pointer_in_range_dfcc(data, current_byte_ptr, last_byte_ptr))
+    __CPROVER_loop_invariant(__CPROVER_pointer_in_range(data, current_byte_ptr, last_byte_ptr))
     {
         sum += *current_byte_ptr;
         current_byte_ptr++;
