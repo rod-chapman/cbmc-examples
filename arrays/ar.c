@@ -43,20 +43,18 @@ uint32_t arsum(const uint8_t *data, size_t num_blocks)
     // Form uint32_t sum of bytes denoted by data.
     // Counting in blocks of 4 bytes at a time.
     uint8_t *current_byte_ptr = data;
-    const uint8_t *last_byte_ptr = data + (num_blocks * BLOCK_SIZE) - 1;
+    const uint8_t *last_block_ptr = data + ((num_blocks - 1) * BLOCK_SIZE);
     uint32_t sum = 0;
 
-    // current_byte_ptr should always be between data and last_byte_ptr, so we
+    // current_byte_ptr should always be between data and last_block_ptr, so we
     // should be able to assert...
-
-
-    // Inclusion of this assertion causes a crash in goto-instrument 5.84
-    __CPROVER_assert(__CPROVER_pointer_in_range(data, current_byte_ptr, last_byte_ptr), "Oops");
+    __CPROVER_assert(__CPROVER_pointer_in_range(data, current_byte_ptr, last_block_ptr),
+                     "Check current_byte_ptr initially in block range");
 
     for(; num_blocks--;)
     __CPROVER_assigns(num_blocks, sum, current_byte_ptr)
     __CPROVER_loop_invariant(num_blocks > 0)
-    __CPROVER_loop_invariant(__CPROVER_pointer_in_range(data, current_byte_ptr, last_byte_ptr))
+    __CPROVER_loop_invariant(__CPROVER_pointer_in_range(data, current_byte_ptr, last_block_ptr))
     {
         sum += *current_byte_ptr;
         current_byte_ptr++;
