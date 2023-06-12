@@ -45,15 +45,16 @@ uint32_t arsum(const uint8_t *data, size_t num_blocks)
     uint8_t *current_byte_ptr = data;
     const uint8_t *last_block_ptr = data + ((num_blocks - 1) * BLOCK_SIZE);
     uint32_t sum = 0;
+    size_t blocks_to_go = num_blocks;
 
     // current_byte_ptr should always be between data and last_block_ptr, so we
     // should be able to assert...
     __CPROVER_assert(__CPROVER_pointer_in_range(data, current_byte_ptr, last_block_ptr),
                      "Check current_byte_ptr initially in block range");
 
-    for(; num_blocks--;)
-    __CPROVER_assigns(num_blocks, sum, current_byte_ptr)
-    __CPROVER_loop_invariant(num_blocks > 0)
+    for(; blocks_to_go--;)
+    __CPROVER_assigns(blocks_to_go, sum, current_byte_ptr)
+    __CPROVER_loop_invariant(blocks_to_go >= 0)
     __CPROVER_loop_invariant(__CPROVER_pointer_in_range(data, current_byte_ptr, last_block_ptr))
     {
         sum += *current_byte_ptr;
