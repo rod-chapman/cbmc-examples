@@ -3,7 +3,7 @@ TARGET ?= f1
 
 CHECKS=--bounds-check --pointer-check \
        --memory-cleanup-check --div-by-zero-check --signed-overflow-check \
-       --pointer-overflow-check --conversion-check \
+       --unsigned-overflow-check --pointer-overflow-check --conversion-check \
        --undefined-shift-check --enum-range-check --pointer-primitive-check
 
 all: clean $(TARGET)
