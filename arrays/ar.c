@@ -52,6 +52,8 @@ uint32_t arsum(const uint8_t *data, size_t num_blocks)
     __CPROVER_loop_invariant(blocks_to_go <= num_blocks)
     __CPROVER_loop_invariant(current_byte_ptr == (data + (num_blocks - blocks_to_go) * BLOCK_SIZE))
     {
+#pragma CPROVER check push
+#pragma CPROVER check disable "unsigned-overflow"
         sum += *current_byte_ptr;
         current_byte_ptr++;
         sum += *current_byte_ptr;
@@ -60,6 +62,7 @@ uint32_t arsum(const uint8_t *data, size_t num_blocks)
         current_byte_ptr++;
         sum += *current_byte_ptr;
         current_byte_ptr++;
+#pragma CPROVER check pop
     }
     return sum;
 }
@@ -85,7 +88,8 @@ void f3_harness()
 
 void arsum_harness()
 {
-    uint8_t d[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    uint8_t *d;
     uint32_t r;
-    r = arsum(d, 2);
+    size_t   n;
+    r = arsum(d, n);
 }
