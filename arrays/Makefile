@@ -1,5 +1,5 @@
 FILE = ar
-TARGET ?= arsum_bytes1
+TARGET ?= arsum_blocks2
 
 CHECKS=--bounds-check --pointer-check \
        --memory-cleanup-check --div-by-zero-check --signed-overflow-check \
@@ -11,7 +11,8 @@ all: clean $(TARGET)
 f1: $(FILE)_contracts.goto results
 f2: $(FILE)_contracts.goto results
 f3: $(FILE)_contracts.goto results
-arsum_blocks: $(FILE)_contracts.goto results
+arsum_blocks1: $(FILE)_contracts.goto results
+arsum_blocks2: $(FILE)_contracts.goto results
 arsum_bytes1: $(FILE)_contracts.goto results
 arsum_bytes2: $(FILE)_contracts.goto results
 
