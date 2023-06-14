@@ -38,7 +38,7 @@ void f3 (st s)
 //    s[8] ^= 0xBEEFDEAD; // this fails as expected
 }
 
-uint32_t arsum(const uint8_t *data, size_t num_blocks)
+uint32_t arsum_blocks(const uint8_t *data, size_t num_blocks)
 {
     // Form uint32_t sum of bytes denoted by data.
     // Counting in blocks of 4 bytes at a time.
@@ -68,6 +68,42 @@ uint32_t arsum(const uint8_t *data, size_t num_blocks)
 }
 
 
+uint32_t arsum_bytes1(const uint8_t *data, size_t num_bytes)
+{
+    // This implementation uses array indexing
+    uint32_t sum = 0;
+    for (size_t idx = 0; idx < num_bytes; idx++)
+    __CPROVER_assigns(idx, sum)
+    {
+#pragma CPROVER check push
+#pragma CPROVER check disable "unsigned-overflow"
+        sum += data[idx];
+#pragma CPROVER check pop
+    }
+    return sum;
+}
+
+uint32_t arsum_bytes2(const uint8_t *data, size_t num_bytes)
+{
+    // This implementation uses explicit pointer arithmetic instead
+    // of array indexing
+    uint8_t *current_byte_ptr = data;
+    uint32_t sum = 0;
+    size_t bytes_to_go = num_bytes;
+    for(; bytes_to_go >= 1; bytes_to_go--)
+    __CPROVER_assigns(bytes_to_go, sum, current_byte_ptr)
+    __CPROVER_loop_invariant(bytes_to_go <= num_bytes)
+    __CPROVER_loop_invariant(current_byte_ptr == (data + (num_bytes - bytes_to_go)))
+    {
+#pragma CPROVER check push
+#pragma CPROVER check disable "unsigned-overflow"
+        sum += *current_byte_ptr;
+        current_byte_ptr++;
+#pragma CPROVER check pop
+    }
+    return sum;
+}
+
 void f1_harness()
 {
     uint32_t st[C] = { 0 };
@@ -86,10 +122,26 @@ void f3_harness()
     f3(t);
 }
 
-void arsum_harness()
+void arsum_blocks_harness()
 {
     uint8_t *d;
     uint32_t r;
     size_t   n;
-    r = arsum(d, n);
+    r = arsum_blocks(d, n);
+}
+
+void arsum_bytes1_harness()
+{
+    uint8_t *d;
+    uint32_t r;
+    size_t   n;
+    r = arsum_bytes1(d, n);
+}
+
+void arsum_bytes2_harness()
+{
+    uint8_t *d;
+    uint32_t r;
+    size_t   n;
+    r = arsum_bytes2(d, n);
 }

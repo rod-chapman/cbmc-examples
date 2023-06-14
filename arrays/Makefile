@@ -1,5 +1,5 @@
 FILE = ar
-TARGET ?= f1
+TARGET ?= arsum_bytes1
 
 CHECKS=--bounds-check --pointer-check \
        --memory-cleanup-check --div-by-zero-check --signed-overflow-check \
@@ -9,13 +9,12 @@ CHECKS=--bounds-check --pointer-check \
 all: clean $(TARGET)
 
 f1: $(FILE)_contracts.goto results
-	echo "Target was $(TARGET)"
 f2: $(FILE)_contracts.goto results
-	echo "Target was $(TARGET)"
 f3: $(FILE)_contracts.goto results
-	echo "Target was $(TARGET)"
-arsum: $(FILE)_contracts.goto results
-	echo "Target was $(TARGET)"
+arsum_blocks: $(FILE)_contracts.goto results
+arsum_bytes1: $(FILE)_contracts.goto results
+arsum_bytes2: $(FILE)_contracts.goto results
+
 
 results: $(FILE)_contracts.goto
 	cbmc --verbosity 6 $(CHECKS) --external-sat-solver cadical $<

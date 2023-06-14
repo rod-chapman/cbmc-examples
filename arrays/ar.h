@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <limits.h>
 
 #define C 8
 
@@ -29,6 +30,19 @@ __CPROVER_assigns(__CPROVER_object_whole(s));
 #define BLOCK_SIZE 4
 
 // 32-bit unsigned sum of data[0 .. num_blocks * BLOCK_SIZE - 1]
-uint32_t arsum(const uint8_t *data, size_t num_blocks)
+uint32_t arsum_blocks(const uint8_t *data, size_t num_blocks)
 __CPROVER_requires(num_blocks >= 1)
+__CPROVER_requires(num_blocks <= LONG_MAX / BLOCK_SIZE)
 __CPROVER_requires(__CPROVER_is_fresh(data, num_blocks * BLOCK_SIZE));
+
+// 32-bit unsigned sum of data[0 .. num_bytes - 1]
+uint32_t arsum_bytes1(const uint8_t *data, size_t num_bytes)
+__CPROVER_requires(num_bytes >= 1)
+__CPROVER_requires(num_bytes <= LONG_MAX)
+__CPROVER_requires(__CPROVER_is_fresh(data, num_bytes));
+
+// 32-bit unsigned sum of data[0 .. num_bytes - 1]
+uint32_t arsum_bytes2(const uint8_t *data, size_t num_bytes)
+__CPROVER_requires(num_bytes >= 1)
+__CPROVER_requires(num_bytes <= LONG_MAX)
+__CPROVER_requires(__CPROVER_is_fresh(data, num_bytes));
