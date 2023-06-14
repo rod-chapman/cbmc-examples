@@ -38,10 +38,34 @@ void f3 (st s)
 //    s[8] ^= 0xBEEFDEAD; // this fails as expected
 }
 
-uint32_t arsum_blocks(const uint8_t *data, size_t num_blocks)
+uint32_t arsum_blocks1(const uint8_t *data, size_t num_blocks)
 {
     // Form uint32_t sum of bytes denoted by data.
     // Counting in blocks of 4 bytes at a time.
+
+    // This implementation uses array indexing rather than pointer arithmetic
+    uint32_t sum = 0;
+    for(size_t current_block = 0; current_block < num_blocks; current_block++)
+    __CPROVER_assigns(sum, current_block)
+    {
+        size_t block_base = current_block * BLOCK_SIZE;
+#pragma CPROVER check push
+#pragma CPROVER check disable "unsigned-overflow"
+        sum += data[block_base];
+        sum += data[block_base + 1];
+        sum += data[block_base + 2];
+        sum += data[block_base + 3];
+#pragma CPROVER check pop
+    }
+    return sum;
+}
+
+uint32_t arsum_blocks2(const uint8_t *data, size_t num_blocks)
+{
+    // Form uint32_t sum of bytes denoted by data.
+    // Counting in blocks of 4 bytes at a time.
+
+    // This implementation uses pointer arithmetic
     uint8_t *current_byte_ptr = data;
     const uint8_t *last_block_ptr = data + ((num_blocks - 1) * BLOCK_SIZE) ;
     uint32_t sum = 0;
@@ -122,12 +146,20 @@ void f3_harness()
     f3(t);
 }
 
-void arsum_blocks_harness()
+void arsum_blocks1_harness()
 {
     uint8_t *d;
     uint32_t r;
     size_t   n;
-    r = arsum_blocks(d, n);
+    r = arsum_blocks1(d, n);
+}
+
+void arsum_blocks2_harness()
+{
+    uint8_t *d;
+    uint32_t r;
+    size_t   n;
+    r = arsum_blocks2(d, n);
 }
 
 void arsum_bytes1_harness()
