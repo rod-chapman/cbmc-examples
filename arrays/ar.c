@@ -1,4 +1,5 @@
 #include "ar.h"
+#include <string.h>
 
 void f1 (uint32_t *s)
 {
@@ -133,8 +134,6 @@ uint32_t arsum_bytes2(const uint8_t *data, size_t num_bytes)
 // Array assignment - element by element copy
 void assign_st1 (st dst, const st src)
 {
-    size_t i;
-
     dst[0] = src[0];
     dst[1] = src[1];
     dst[2] = src[2];
@@ -143,9 +142,6 @@ void assign_st1 (st dst, const st src)
     dst[5] = src[5];
     dst[6] = src[6];
     dst[7] = src[7];
-
-    __CPROVER_assert(__CPROVER_forall { size_t j; (0 <= j && j < C) ==> dst[j] == src[j] },
-                     "Check array copied correctly");
 }
 
 // Array assignment by loop copy
@@ -154,18 +150,26 @@ void assign_st2 (st dst, const st src)
     size_t i;
 
     for (i = 0; i < C; i++)
-    __CPROVER_assigns(i, dst)
+    __CPROVER_assigns(i, __CPROVER_object_whole(dst))
     __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == src[j] })
     {
         dst[i] = src[i];
     }
 
+    // Substitute i == C into the loop invariant to get:
     __CPROVER_assert(__CPROVER_forall { size_t j; (0 <= j && j < C) ==> dst[j] == src[j] },
                      "Check array copied correctly");
 }
 
+// Array assignment using memcpy()
+void assign_st3 (st dst, const st src)
+{
+    memcpy (dst, src, sizeof(st));
+}
 
-
+/////////////
+// HARNESSES
+/////////////
 
 void f1_harness()
 {
@@ -231,4 +235,12 @@ void assign_st2_harness()
     st dest;
 
     assign_st2(dest, source);
+}
+
+void assign_st3_harness()
+{
+    st source;
+    st dest;
+
+    assign_st3(dest, source);
 }

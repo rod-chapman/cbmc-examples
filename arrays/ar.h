@@ -66,3 +66,9 @@ __CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
 __CPROVER_requires(__CPROVER_is_fresh(src, sizeof(st)))
 __CPROVER_assigns(__CPROVER_object_whole(dst))
 __CPROVER_ensures(__CPROVER_forall { size_t i; (0 <= i && i < C) ==> dst[i] == src[i] });
+
+void assign_st3 (st dst, const st src)
+__CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
+__CPROVER_requires(__CPROVER_is_fresh(src, sizeof(st)))
+__CPROVER_assigns(__CPROVER_object_whole(dst))
+__CPROVER_ensures(__CPROVER_forall { size_t i; (0 <= i && i < C) ==> dst[i] == src[i] });
