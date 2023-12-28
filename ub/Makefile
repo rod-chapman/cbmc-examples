@@ -9,13 +9,16 @@ CHECKS=--bounds-check --pointer-check \
        --undefined-shift-check --enum-range-check --pointer-primitive-check
 
 
-$(TARGET): $(FILE)_contracts.goto
+$(TARGET): $(FILE)_contracts2.goto
 	cbmc --verbosity 6 $(CHECKS) --external-sat-solver cadical $<
 
 $(FILE)_contracts.goto: $(FILE).goto
+	goto-instrument --drop-unused-functions $< $@
+
+$(FILE)_contracts2.goto: $(FILE)_contracts.goto
 	goto-instrument $(CHECKS) --dfcc $(TARGET)_harness --apply-loop-contracts --enforce-contract $(TARGET) $< $@
 
-$(FILE).goto: $(FILE).c#
+$(FILE).goto: $(FILE).c
 	goto-cc --function $(TARGET)_harness -DCBMC -o $@ $<
 
 clean:

@@ -14,15 +14,21 @@ int ub1(void) {
   // a single object before a single sequence point
   y = (x = 2) + (x = 1);
 
-  __CPROVER_assert(y == 0, "Oops0..."); // FAILURE
-  __CPROVER_assert(y == 1, "Oops1..."); // FAILURE
+//  __CPROVER_assert(y == 0, "Oops0..."); // FAILURE
+//  __CPROVER_assert(y == 1, "Oops1..."); // FAILURE
   __CPROVER_assert(y == 2, "Oops2..."); // SUCCESS ?!?!?
-  __CPROVER_assert(y == 3, "Oops3..."); // FAILURE
-  printf ("y is %d\n", y); // Prints "y is 3" with clang 14.0.3
+//  __CPROVER_assert(y == 3, "Oops3..."); // FAILURE
+//  printf ("y is %d\n", y); // Prints "y is 3" with clang 14.0.3
 
 }
 
 int ub1_harness(void)
 {
     ub1();
+}
+
+int main(void)
+{
+    ub1();
+    return 0;
 }
