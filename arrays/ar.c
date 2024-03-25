@@ -147,9 +147,7 @@ void assign_st1 (st dst, const st src)
 // Array assignment by loop copy
 void assign_st2 (st dst, const st src)
 {
-    size_t i;
-
-    for (i = 0; i < C; i++)
+    for (size_t i = 0; i < C; i++)
     __CPROVER_assigns(i, __CPROVER_object_whole(dst))
     __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == src[j] })
     {
