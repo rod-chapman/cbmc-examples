@@ -149,6 +149,7 @@ void assign_st2 (st dst, const st src)
 {
     for (size_t i = 0; i < C; i++)
     __CPROVER_assigns(i, __CPROVER_object_whole(dst))
+    __CPROVER_loop_invariant(i <= C)
     __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == src[j] })
     {
         dst[i] = src[i];
