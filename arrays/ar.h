@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <limits.h>
 
 #define C 8
@@ -72,3 +73,14 @@ __CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
 __CPROVER_requires(__CPROVER_is_fresh(src, sizeof(st)))
 __CPROVER_assigns(__CPROVER_object_whole(dst))
 __CPROVER_ensures(__CPROVER_forall { size_t i; (0 <= i && i < C) ==> dst[i] == src[i] });
+
+
+/* Returns true if a and b are equal. Execution time may depend on len */
+/* but not on the value of the data denoted by a or b                  */
+bool constant_time_equals_strict(const uint8_t* const a,
+                                 const uint8_t* const b,
+                                 const uint32_t len)
+__CPROVER_requires(a != NULL && __CPROVER_is_fresh(a, len))
+__CPROVER_requires(b != NULL && __CPROVER_is_fresh(b, len))
+__CPROVER_requires(len >= 1)
+__CPROVER_ensures(__CPROVER_return_value == __CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (a[i] == b[i]) });

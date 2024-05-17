@@ -166,6 +166,26 @@ void assign_st3 (st dst, const st src)
     memcpy (dst, src, sizeof(st));
 }
 
+bool constant_time_equals_strict(const uint8_t *const a,
+                                 const uint8_t *const b,
+                                 const uint32_t len)
+{
+    bool arrays_match = true;
+    /* iterate over each byte in the slices */
+    for (size_t i = 0; i < len; i++)
+    __CPROVER_assigns(i, arrays_match)
+    __CPROVER_loop_invariant(i <= len)
+    __CPROVER_loop_invariant(arrays_match == __CPROVER_forall { size_t j; (j >= 0 && j < i) ==> (a[j] == b[j]) })
+    {
+        arrays_match = arrays_match && (a[i] == b[i]);
+    }
+
+    __CPROVER_assert(arrays_match ==
+                     __CPROVER_forall { size_t j; (j >= 0 && j < len) ==> (a[j] == b[j]) },
+                     "Postcondition not proved");
+    return arrays_match;
+}
+
 /////////////
 // HARNESSES
 /////////////
@@ -242,4 +262,16 @@ void assign_st3_harness()
     st dest;
 
     assign_st3(dest, source);
+}
+
+void constant_time_equals_strict_harness()
+{
+    uint8_t *a;
+    uint8_t *b;
+    uint32_t len;
+    bool result;
+    __CPROVER_assume(a != NULL);
+    __CPROVER_assume(b != NULL);
+    __CPROVER_assume(len >= 1);
+    result = constant_time_equals_strict(a, b, len);
 }
