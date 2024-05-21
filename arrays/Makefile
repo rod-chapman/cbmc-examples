@@ -18,7 +18,7 @@ arsum_bytes2: $(FILE)_contracts.goto results
 assign_st1: $(FILE)_contracts.goto results_sat
 assign_st2: $(FILE)_contracts.goto results_smt
 assign_st3: $(FILE)_contracts.goto results_smt
-constant_time_equals_strict: $(FILE)_contracts.goto results
+constant_time_equals_strict: $(FILE)_contracts.goto results_smt
 
 
 results: $(FILE)_contracts.goto
