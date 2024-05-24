@@ -187,6 +187,17 @@ bool constant_time_equals_strict(const uint8_t *const a,
     return arrays_equal;
 }
 
+bool constant_time_equals_total(const uint8_t *const a,
+                                const uint8_t *const b,
+                                const uint32_t len)
+{
+    if (a != NULL && b != NULL) {
+        return constant_time_equals_strict(a, b, len);
+    } else {
+        return false;
+    }
+}
+
 /////////////
 // HARNESSES
 /////////////
@@ -271,8 +282,14 @@ void constant_time_equals_strict_harness()
     uint8_t *b;
     uint32_t len;
     bool result;
-    __CPROVER_assume(a != NULL);
-    __CPROVER_assume(b != NULL);
-    __CPROVER_assume(len >= 1);
     result = constant_time_equals_strict(a, b, len);
+}
+
+void constant_time_equals_total_harness()
+{
+    uint8_t *a;
+    uint8_t *b;
+    uint32_t len;
+    bool result;
+    result = constant_time_equals_total(a, b, len);
 }

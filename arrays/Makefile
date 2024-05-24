@@ -19,6 +19,7 @@ assign_st1: $(FILE)_contracts.goto results_sat
 assign_st2: $(FILE)_contracts.goto results_smt
 assign_st3: $(FILE)_contracts.goto results_smt
 constant_time_equals_strict: $(FILE)_contracts.goto results_smt
+constant_time_equals_total: $(FILE)_contracts.goto results_smt
 
 
 results: $(FILE)_contracts.goto
@@ -32,6 +33,7 @@ results_smt: $(FILE)_contracts.goto
 
 $(FILE)_contracts.goto: $(FILE).goto
 	goto-instrument --dfcc $(TARGET)_harness --apply-loop-contracts --enforce-contract $(TARGET) $< $@
+#	goto-instrument --dfcc $(TARGET)_harness --apply-loop-contracts --enforce-contract $(TARGET) --replace-call-with-contract constant_time_equals_strict $< $@
 
 $(FILE).goto: $(FILE).c
 	goto-cc --function $(TARGET)_harness -DCBMC -o $@ $<
