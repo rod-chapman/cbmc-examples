@@ -94,3 +94,14 @@ bool constant_time_equals_total(const uint8_t* const a,
 __CPROVER_requires(__CPROVER_is_fresh(a, len))
 __CPROVER_requires(__CPROVER_is_fresh(b, len))
 __CPROVER_ensures(__CPROVER_return_value == (a != NULL && b != NULL) ? __CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (a[i] == b[i]) } : false );
+
+/* Constant Time Condition Copy */
+int ctcc(uint8_t* dst, const uint8_t* src, uint32_t len, uint8_t dont)
+__CPROVER_requires(dst != NULL && __CPROVER_is_fresh(dst, len))
+__CPROVER_requires(src != NULL && __CPROVER_is_fresh(src, len))
+__CPROVER_assigns(__CPROVER_object_whole(dst))
+__CPROVER_ensures(__CPROVER_return_value == 0)
+__CPROVER_ensures(dont > 0 ?
+                  (__CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (dst [i] == __CPROVER_old(dst)[i]) } )
+                  :
+                  (__CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (dst [i] == src [i]) } ));
