@@ -170,21 +170,21 @@ bool constant_time_equals_strict(const uint8_t *const a,
                                  const uint8_t *const b,
                                  const uint32_t len)
 {
-    bool arrays_differ = false;
+    bool arrays_equal = true;
     /* iterate over each byte in the slices */
     for (size_t i = 0; i < len; i++)
-    __CPROVER_assigns(i, arrays_differ)
+    __CPROVER_assigns(i, arrays_equal)
     __CPROVER_loop_invariant(i <= len)
-    __CPROVER_loop_invariant(arrays_differ != __CPROVER_forall { size_t j; (j >= 0 && j < i) ==> (a[j] == b[j]) })
+    __CPROVER_loop_invariant(arrays_equal == __CPROVER_forall { size_t j; (j >= 0 && j < i) ==> (a[j] == b[j]) })
     __CPROVER_decreases(len - i)
     {
-        arrays_differ = arrays_differ || (a[i] != b[i]);
+        arrays_equal = arrays_equal && (a[i] == b[i]);
     }
 
-    __CPROVER_assert(arrays_differ !=
+    __CPROVER_assert(arrays_equal ==
                      __CPROVER_forall { size_t j; (j >= 0 && j < len) ==> (a[j] == b[j]) },
                      "Post-loop assertion");
-    return !arrays_differ;
+    return arrays_equal;
 }
 
 /////////////
