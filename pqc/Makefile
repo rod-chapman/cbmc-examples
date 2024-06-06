@@ -1,4 +1,4 @@
-FILE=mod3329
+FILE=crypto
 
 all: $(TARGET)
 
@@ -18,14 +18,14 @@ $(FILE)_contracts.goto: $(FILE).goto
 $(FILE).goto: $(FILE).c
 	goto-cc --function $(TARGET)_harness -DCBMC -o $@ $<
 
-testmod: testmod.c mod3329.h mod3329.c
-	gcc -S -Os mod3329.c
-	mv mod3329.s mod3329Os.s
-	gcc -S -O2 mod3329.c
-	mv mod3329.s mod3329O2.s
-	gcc -c mod3329.c
+testmod: testmod.c crypto.h crypto.c
+	gcc -S -Os crypto.c
+	mv crypto.s cryptoOs.s
+	gcc -S -O2 crypto.c
+	mv crypto.s cryptoO2.s
+	gcc -c crypto.c
 	gcc -c testmod.c
-	gcc -o $@ testmod.o mod3329.o
+	gcc -o $@ testmod.o crypto.o
 
 clean:
 	rm -f *.goto
