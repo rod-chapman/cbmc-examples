@@ -207,7 +207,7 @@ int ctcc(uint8_t *dst, const uint8_t *src, uint32_t len, uint8_t dont)
     __CPROVER_assert(mask == (dont == 0 ? 0xff : 0x00), "prove mask set correctly");
 
     for (size_t i = 0; i < len; i++)
-    __CPROVER_assigns(i, dst)
+    __CPROVER_assigns(i, __CPROVER_object_whole(dst))
     __CPROVER_loop_invariant(i <= len)
     __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == (dont == 0 ? src[j] : __CPROVER_loop_entry(dst)[j]) })
     {
