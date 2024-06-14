@@ -219,6 +219,27 @@ int ctcc(uint8_t *dst, const uint8_t *src, uint32_t len, uint8_t dont)
     return 0;
 }
 
+int ctunpad(uint8_t* dst, const uint8_t* src, uint32_t srclen, uint32_t dstlen)
+{
+    size_t first_padding_byte_index = 2;
+    size_t first_data_byte_index = srclen - dstlen;
+    size_t zero_byte_index = first_data_byte_index - 1;
+    uint8_t dont_copy;
+
+    dont_copy = src[0] | (src[1] ^ 0x02);
+    dont_copy = dont_copy | src[zero_byte_index];
+
+    for (size_t i = first_padding_byte_index; i < zero_byte_index; i++)
+    __CPROVER_assigns(i, dont_copy)
+    __CPROVER_loop_invariant(i <= zero_byte_index)
+    __CPROVER_loop_invariant(zero_byte_index < srclen)
+    {
+        dont_copy = dont_copy | src[i];
+    }
+
+    ctcc (dst, &src[first_data_byte_index], dstlen, dont_copy);
+}
+
 
 
 
@@ -327,4 +348,14 @@ void ctcc_harness()
     int result;
 
     result = ctcc(a, b, len, dont);
+}
+
+void ctunpad_harness()
+{
+    uint8_t *src;
+    uint8_t *dst;
+    uint32_t srclen;
+    uint32_t dstlen;
+    int result;
+    result = ctunpad(dst, src, srclen, dstlen);
 }

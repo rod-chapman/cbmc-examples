@@ -105,3 +105,12 @@ __CPROVER_ensures(dont > 0 ?
                   (__CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (dst [i] == __CPROVER_old(dst)[i]) } )
                   :
                   (__CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (dst [i] == src [i]) } ));
+
+/* Constant time conditional unpad */
+int ctunpad(uint8_t* dst, const uint8_t* src, uint32_t srclen, uint32_t dstlen)
+__CPROVER_requires(dst != NULL && __CPROVER_is_fresh(dst, dstlen))
+__CPROVER_requires(src != NULL && __CPROVER_is_fresh(src, srclen))
+__CPROVER_requires(srclen > dstlen)
+__CPROVER_requires(srclen - dstlen >= 3)
+__CPROVER_assigns(__CPROVER_object_whole(dst))
+__CPROVER_ensures(__CPROVER_return_value == 0);
