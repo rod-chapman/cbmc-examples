@@ -237,7 +237,7 @@ int ctunpad(uint8_t* dst, const uint8_t* src, uint32_t srclen, uint32_t dstlen)
         dont_copy = dont_copy | src[i];
     }
 
-    ctcc (dst, &src[first_data_byte_index], dstlen, dont_copy);
+    return ctcc (dst, &src[first_data_byte_index], dstlen, dont_copy);
 }
 
 

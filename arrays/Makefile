@@ -25,6 +25,8 @@ ctunpad: $(FILE)_contracts.goto results_smt
 
 ifeq ($(strip $(TARGET)),constant_time_equals_total)
   CALLS = --replace-call-with-contract constant_time_equals_strict
+else ifeq ($(strip $(TARGET)),ctunpad)
+  CALLS = --replace-call-with-contract ctcc
 else
   CALLS =
 endif
