@@ -21,6 +21,13 @@ assign_st3: $(FILE)_contracts.goto results_smt
 constant_time_equals_strict: $(FILE)_contracts.goto results_smt
 constant_time_equals_total: $(FILE)_contracts.goto results_smt
 ctcc: $(FILE)_contracts.goto results_smt
+ctunpad: $(FILE)_contracts.goto results_smt
+
+ifeq ($(strip $(TARGET)),constant_time_equals_total)
+  CALLS = --replace-call-with-contract constant_time_equals_strict
+else
+  CALLS =
+endif
 
 
 results: $(FILE)_contracts.goto
@@ -33,8 +40,7 @@ results_smt: $(FILE)_contracts.goto
 	cbmc --verbosity 6 $(CHECKS) --smt2 $<
 
 $(FILE)_contracts.goto: $(FILE).goto
-	goto-instrument --dfcc $(TARGET)_harness --apply-loop-contracts --enforce-contract $(TARGET) $< $@
-#	goto-instrument --dfcc $(TARGET)_harness --apply-loop-contracts --enforce-contract $(TARGET) --replace-call-with-contract constant_time_equals_strict $< $@
+	goto-instrument --dfcc $(TARGET)_harness --apply-loop-contracts --enforce-contract $(TARGET) $(CALLS) $< $@
 
 $(FILE).goto: $(FILE).c
 	goto-cc --function $(TARGET)_harness -DCBMC -o $@ $<
