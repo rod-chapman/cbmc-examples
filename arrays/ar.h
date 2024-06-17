@@ -74,6 +74,11 @@ __CPROVER_requires(__CPROVER_is_fresh(src, sizeof(st)))
 __CPROVER_assigns(__CPROVER_object_whole(dst))
 __CPROVER_ensures(__CPROVER_forall { size_t i; (0 <= i && i < C) ==> dst[i] == src[i] });
 
+void init_st (st dst)
+__CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
+__CPROVER_assigns(__CPROVER_object_whole(dst))
+__CPROVER_ensures(__CPROVER_forall { unsigned i; (0 <= i && i < C) ==> dst[i] == 0 });
+
 
 /* Returns true if a and b are equal. Execution time may depend on len */
 /* but not on the value of the data denoted by a or b                  */

@@ -166,6 +166,21 @@ void assign_st3 (st dst, const st src)
     memcpy (dst, src, sizeof(st));
 }
 
+void init_st (st dst)
+{
+    size_t i;
+    for (i = 0; i < C; i++)
+    __CPROVER_assigns(i, __CPROVER_object_whole(dst))
+    __CPROVER_loop_invariant(i <= C)
+    __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == 0 } )
+    {
+        dst[i] = 0;
+    }
+}
+
+
+
+
 bool constant_time_equals_strict(const uint8_t *const a,
                                  const uint8_t *const b,
                                  const uint32_t len)
@@ -175,7 +190,9 @@ bool constant_time_equals_strict(const uint8_t *const a,
     for (size_t i = 0; i < len; i++)
     __CPROVER_assigns(i, arrays_equal)
     __CPROVER_loop_invariant(i <= len)
-    __CPROVER_loop_invariant(arrays_equal == __CPROVER_forall { size_t j; (j >= 0 && j < i) ==> (a[j] == b[j]) })
+    __CPROVER_loop_invariant(arrays_equal ==
+                             __CPROVER_forall { size_t j; (j >= 0 && j < i) ==>
+                                   (a[j] == b[j]) })
     __CPROVER_decreases(len - i)
     {
         arrays_equal = arrays_equal && (a[i] == b[i]);
@@ -209,7 +226,8 @@ int ctcc(uint8_t *dst, const uint8_t *src, uint32_t len, uint8_t dont)
     for (size_t i = 0; i < len; i++)
     __CPROVER_assigns(i, __CPROVER_object_whole(dst))
     __CPROVER_loop_invariant(i <= len)
-    __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == (dont == 0 ? src[j] : __CPROVER_loop_entry(dst)[j]) })
+    __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==>
+                             dst[j] == (dont == 0 ? src[j] : __CPROVER_loop_entry(dst)[j]) })
     {
         uint8_t old = dst[i];
         uint8_t diff = (old ^ src[i]) & mask;
@@ -319,6 +337,13 @@ void assign_st3_harness()
     st dest;
 
     assign_st3(dest, source);
+}
+
+void init_st_harness()
+{
+    st dest;
+
+    init_st(dest);
 }
 
 void constant_time_equals_strict_harness()
