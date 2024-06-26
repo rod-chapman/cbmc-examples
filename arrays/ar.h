@@ -79,6 +79,11 @@ __CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
 __CPROVER_assigns(__CPROVER_object_whole(dst))
 __CPROVER_ensures(__CPROVER_forall { unsigned k; (0 <= k && k < C) ==> dst[k] == 0 });
 
+void zero_slice (uint8_t *dst, size_t len)
+__CPROVER_requires(__CPROVER_is_fresh(dst, len))
+__CPROVER_assigns(__CPROVER_object_upto(dst, len))
+__CPROVER_ensures(__CPROVER_forall { unsigned k; (0 <= k && k < len) ==> dst[k] == 0 });
+
 
 /* Returns true if a and b are equal. Execution time may depend on len */
 /* but not on the value of the data denoted by a or b                  */
