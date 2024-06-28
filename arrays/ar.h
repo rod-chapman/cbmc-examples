@@ -103,7 +103,14 @@ bool constant_time_equals_total(const uint8_t* const a,
                                 const uint32_t len)
 __CPROVER_requires(__CPROVER_is_fresh(a, len))
 __CPROVER_requires(__CPROVER_is_fresh(b, len))
-__CPROVER_ensures(__CPROVER_return_value == (a != NULL && b != NULL) ? __CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (a[i] == b[i]) } : false );
+__CPROVER_ensures(((a != NULL && b != NULL) && __CPROVER_return_value == __CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (a[i] == b[i]) } )
+                  ||
+                  ((a == NULL || b == NULL) && __CPROVER_return_value == false)
+                 );
+// This form of postcondition using C's ternary ? : operator, but causes non-termination for Z3 and "unknown" from CVC5 with CBMC 6.0.0
+//__CPROVER_ensures(__CPROVER_return_value == (a != NULL && b != NULL) ? __CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (a[i] == b[i]) } : false );
+
+
 
 /* Constant Time Condition Copy */
 int ctcc(uint8_t* dst, const uint8_t* src, uint32_t len, uint8_t dont)
