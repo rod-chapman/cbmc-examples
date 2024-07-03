@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "mod3329.h"
+#include "crypto.h"
 
 int main()
 {

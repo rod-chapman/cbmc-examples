@@ -9,7 +9,7 @@ CHECKS=--bounds-check --pointer-check \
 
 
 $(TARGET): $(FILE)_contracts.goto
-	-cbmc --verbosity 6 $(CHECKS) --external-sat-solver cadical $<
+	-cbmc --verbosity 6 $(CHECKS) --external-sat-solver kissat $<
 	rm -f *.goto
 
 $(FILE)_contracts.goto: $(FILE).goto
