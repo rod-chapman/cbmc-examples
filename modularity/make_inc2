@@ -17,7 +17,7 @@ results_smt: $(FILE)_contracts.goto
 	cbmc $(CHECKS) --verbosity 6 --smt2 $<
 
 $(FILE)_contracts.goto: $(FILE).goto
-	goto-instrument --dfcc $(HARNESS) --enforce-contract $(TARGET) $< $@
+	goto-instrument --dfcc $(HARNESS) --enforce-contract $(TARGET) --replace-call-with-contract inc $< $@
 
 $(FILE).goto: $(FILE).c
 	goto-cc --function $(HARNESS) -DCBMC -o $@ $^
