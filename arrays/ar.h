@@ -93,7 +93,7 @@ bool constant_time_equals_strict(const uint8_t* const a,
                                  const uint32_t len)
 __CPROVER_requires(a != NULL && __CPROVER_is_fresh(a, len))
 __CPROVER_requires(b != NULL && __CPROVER_is_fresh(b, len))
-__CPROVER_ensures(__CPROVER_return_value == __CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (a[i] == b[i]) });
+__CPROVER_ensures(__CPROVER_return_value == __CPROVER_forall { unsigned k; (k >= 0 && k < len) ==> (a[k] == b[k]) });
 
 /* Returns true if a and b are equal. Execution time may depend on len */
 /* but not on the value of the data denoted by a or b                  */
@@ -103,12 +103,12 @@ bool constant_time_equals_total(const uint8_t* const a,
                                 const uint32_t len)
 __CPROVER_requires(__CPROVER_is_fresh(a, len))
 __CPROVER_requires(__CPROVER_is_fresh(b, len))
-__CPROVER_ensures(((a != NULL && b != NULL) && __CPROVER_return_value == __CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (a[i] == b[i]) } )
+__CPROVER_ensures(((a != NULL && b != NULL) && __CPROVER_return_value == constant_time_equals_strict(a, b, len) )
                   ||
                   ((a == NULL || b == NULL) && __CPROVER_return_value == false)
                  );
 // This form of postcondition using C's ternary ? : operator, but causes non-termination for Z3 and "unknown" from CVC5 with CBMC 6.0.0
-//__CPROVER_ensures(__CPROVER_return_value == (a != NULL && b != NULL) ? __CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (a[i] == b[i]) } : false );
+//__CPROVER_ensures(__CPROVER_return_value == ((a != NULL && b != NULL) ? constant_time_equals_strict(a, b, len) : false) );
 
 
 
