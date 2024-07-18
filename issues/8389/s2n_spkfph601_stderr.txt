@@ -1,0 +1,3 @@
+--cover is incompatible with --unwinding-assertions, so unwinding-assertions will be defaulted to false
+**** WARNING: Use --unwinding-assertions to obtain sound verification results
+**** WARNING: Use --unwinding-assertions to obtain sound verification results

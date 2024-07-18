@@ -1,0 +1,8 @@
+CBMC version 6.0.1 (cbmc-6.0.1-35-gc7d7704179) 64-bit arm64 macos
+Reading GOTO program from file s2n_spkfph601.goto
+Generating GOTO Program
+Adding CPROVER library (arm64)
+Removal of function pointers and virtual functions
+Generic Property Instrumentation
+Rewriting existing assertions as assumptions
+Starting Bounded Model Checking
