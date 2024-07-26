@@ -48,6 +48,8 @@ uint32_t arsum_blocks1(const uint8_t *data, size_t num_blocks)
     uint32_t sum = 0;
     for(size_t current_block = 0; current_block < num_blocks; current_block++)
     __CPROVER_assigns(sum, current_block)
+    __CPROVER_loop_invariant(current_block <= num_blocks)
+    __CPROVER_decreases(num_blocks - current_block)
     {
         size_t block_base = current_block * BLOCK_SIZE;
 #pragma CPROVER check push
@@ -76,6 +78,7 @@ uint32_t arsum_blocks2(const uint8_t *data, size_t num_blocks)
     __CPROVER_assigns(blocks_to_go, sum, current_byte_ptr)
     __CPROVER_loop_invariant(blocks_to_go <= num_blocks)
     __CPROVER_loop_invariant(current_byte_ptr == (data + (num_blocks - blocks_to_go) * BLOCK_SIZE))
+    __CPROVER_decreases(blocks_to_go)
     {
 #pragma CPROVER check push
 #pragma CPROVER check disable "unsigned-overflow"
@@ -99,6 +102,8 @@ uint32_t arsum_bytes1(const uint8_t *data, size_t num_bytes)
     uint32_t sum = 0;
     for (size_t idx = 0; idx < num_bytes; idx++)
     __CPROVER_assigns(idx, sum)
+    __CPROVER_loop_invariant(idx <= num_bytes)
+    __CPROVER_decreases(num_bytes - idx)
     {
 #pragma CPROVER check push
 #pragma CPROVER check disable "unsigned-overflow"
@@ -119,6 +124,7 @@ uint32_t arsum_bytes2(const uint8_t *data, size_t num_bytes)
     __CPROVER_assigns(bytes_to_go, sum, current_byte_ptr)
     __CPROVER_loop_invariant(bytes_to_go <= num_bytes)
     __CPROVER_loop_invariant(current_byte_ptr == (data + (num_bytes - bytes_to_go)))
+    __CPROVER_decreases(bytes_to_go)
     {
 #pragma CPROVER check push
 #pragma CPROVER check disable "unsigned-overflow"
@@ -151,6 +157,7 @@ void assign_st2 (st dst, const st src)
     __CPROVER_assigns(i, __CPROVER_object_whole(dst))
     __CPROVER_loop_invariant(i <= C)
     __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == src[j] })
+    __CPROVER_decreases(C - i)
     {
         dst[i] = src[i];
     }
@@ -173,6 +180,7 @@ void init_st (st dst)
     __CPROVER_assigns(i, __CPROVER_object_whole(dst))
     __CPROVER_loop_invariant(i <= C)
     __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == 0 } )
+    __CPROVER_decreases(C - i)
     {
         dst[i] = 0;
     }
@@ -185,6 +193,7 @@ void zero_slice (uint8_t *dst, size_t len)
     __CPROVER_assigns(i, __CPROVER_object_upto(dst, len))
     __CPROVER_loop_invariant(i <= len)
     __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == 0 } )
+    __CPROVER_decreases(len - i)
     {
         dst[i] = 0;
     }
@@ -239,6 +248,7 @@ int ctcc(uint8_t *dst, const uint8_t *src, uint32_t len, uint8_t dont)
     __CPROVER_loop_invariant(i <= len)
     __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==>
                              dst[j] == (dont == 0 ? src[j] : __CPROVER_loop_entry(dst)[j]) })
+    __CPROVER_decreases(len - i)
     {
         uint8_t old = dst[i];
         uint8_t diff = (old ^ src[i]) & mask;
@@ -262,6 +272,7 @@ int ctunpad(uint8_t* dst, const uint8_t* src, uint32_t srclen, uint32_t dstlen)
     __CPROVER_assigns(i, dont_copy)
     __CPROVER_loop_invariant(i <= zero_byte_index)
     __CPROVER_loop_invariant(zero_byte_index < srclen)
+    __CPROVER_decreases(zero_byte_index - i)
     {
         dont_copy = dont_copy | src[i];
     }
