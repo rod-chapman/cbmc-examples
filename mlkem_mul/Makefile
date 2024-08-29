@@ -12,6 +12,9 @@ all: clean $(TARGET)
 mul: $(FILE)_contracts.goto results_z3
 	echo "Done"
 
+mul2: $(FILE)_contracts.goto results_z3
+	echo "Done"
+
 results_z3: $(FILE)_contracts.goto
 	cbmc --verbosity 6 $(CHECKS) --smt2 $<
 
