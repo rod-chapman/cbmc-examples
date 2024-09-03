@@ -8,9 +8,19 @@ CHECKS=--bounds-check --pointer-check \
        --undefined-shift-check --enum-range-check --pointer-primitive-check
 
 
-$(TARGET): $(FILE)_contracts.goto
-	-cbmc --verbosity 6 $(CHECKS) --external-sat-solver kissat $<
-	rm -f *.goto
+$(TARGET): $(FILE)_contracts.goto kissat
+
+sat: $(FILE)_contracts.goto
+	cbmc --verbosity 6 $(CHECKS) $<
+
+z3: $(FILE)_contracts.goto
+	cbmc --verbosity 6 $(CHECKS) --smt2 $<
+
+bitwuzla: $(FILE)_contracts.goto
+	cbmc --verbosity 6 $(CHECKS) --bitwuzla $<
+
+kissat: $(FILE)_contracts.goto
+	cbmc --verbosity 6 $(CHECKS) --external-sat-solver kissat $<
 
 $(FILE)_contracts.goto: $(FILE).goto
 	goto-instrument $(CHECKS) --dfcc $(TARGET)_harness --apply-loop-contracts --enforce-contract $(TARGET) $< $@
