@@ -192,7 +192,30 @@ void zero_slice (uint8_t *dst, size_t len)
     for (i = 0; i < len; i++)
     __CPROVER_assigns(i, __CPROVER_object_upto(dst, len))
     __CPROVER_loop_invariant(i <= len)
-    __CPROVER_loop_invariant(__CPROVER_forall { size_t j; (0 <= j && j < i) ==> dst[j] == 0 } )
+    __CPROVER_loop_invariant(__CPROVER_forall { int j; (0 <= j && j < i) ==> dst[j] == 0 } )
+    __CPROVER_decreases(len - i)
+    {
+        dst[i] = 0;
+    }
+}
+
+void zero_array_ts (uint8_t *dst, int len)
+{
+    for (int i = 0; i < len; i++)
+    __CPROVER_assigns(i, __CPROVER_object_whole(dst))
+    __CPROVER_loop_invariant(i >= 0 && i <= len)
+    __CPROVER_decreases(len - i)
+    {
+        dst[i] = 0;
+    }
+}
+
+void zero_array_correct (uint8_t *dst, int len)
+{
+    for (int i = 0; i < len; i++)
+    __CPROVER_assigns(i, __CPROVER_object_whole(dst))
+    __CPROVER_loop_invariant(i >= 0 && i <= len)
+    __CPROVER_loop_invariant(__CPROVER_forall { int j; (0 <= j && j < i) ==> dst[j] == 0 } )
     __CPROVER_decreases(len - i)
     {
         dst[i] = 0;
@@ -374,6 +397,22 @@ void zero_slice_harness()
     size_t len;
 
     zero_slice(dst, len);
+}
+
+void zero_array_ts_harness()
+{
+    uint8_t *dst;
+    int len;
+
+    zero_array_ts(dst, len);
+}
+
+void zero_array_correct_harness()
+{
+    uint8_t *dst;
+    int len;
+
+    zero_array_correct(dst, len);
 }
 
 void constant_time_equals_strict_harness()

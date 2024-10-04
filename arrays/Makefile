@@ -23,6 +23,8 @@ assign_st2: $(FILE)_contracts.goto results_z3
 assign_st3: $(FILE)_contracts.goto results_z3
 init_st: $(FILE)_contracts.goto results_z3
 zero_slice: $(FILE)_contracts.goto results_z3
+zero_array_ts: $(FILE)_contracts.goto results_z3
+zero_array_correct: $(FILE)_contracts.goto results_z3
 
 # Functions that prove best with Bitwuzla
 constant_time_equals_strict: $(FILE)_contracts.goto results_bitwuzla
