@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+
+FILE = main2
+TARGET ?= mvm
+
+CHECKS=--bounds-check --pointer-check \
+       --memory-cleanup-check --div-by-zero-check --signed-overflow-check \
+       --unsigned-overflow-check --pointer-overflow-check --conversion-check \
+       --undefined-shift-check --enum-range-check --pointer-primitive-check
+
+all: clean results_smt
+
+f: $(FILE)_contracts.goto results_smt
+
+results_smt: $(FILE)_contracts2.goto
+	cbmc --smt2 --outfile mvm.smt2 --z3 $<
+
+$(FILE)_contracts1.goto: $(FILE).goto
+	cp $< $@
+
+$(FILE)_contracts2.goto: $(FILE)_contracts1.goto
+	goto-instrument --dfcc $(TARGET)_harness --enforce-contract $(TARGET) --apply-loop-contracts --replace-call-with-contract polyvec_basemul_acc_montgomery_cached $< $@
+
+$(FILE).goto: $(FILE).c
+	goto-cc --function $(TARGET)_harness -DCBMC -o $@ $^
+	goto-instrument --show-loops $@
+
+clean:
+	rm -f *.goto
