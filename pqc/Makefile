@@ -8,7 +8,7 @@ CHECKS=--bounds-check --pointer-check \
        --undefined-shift-check --enum-range-check --pointer-primitive-check
 
 
-$(TARGET): $(FILE)_contracts.goto kissat
+$(TARGET): clean $(FILE)_contracts.goto bitwuzla
 
 sat: $(FILE)_contracts.goto
 	cbmc --verbosity 6 $(CHECKS) $<
