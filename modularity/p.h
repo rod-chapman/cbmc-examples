@@ -1,5 +1,8 @@
 #include <stdint.h>
+#include "../common/cbmc.h"
 
-int32_t inc (int32_t x)
-__CPROVER_requires(x < 20)
-__CPROVER_ensures(__CPROVER_return_value == x + 1);
+int32_t inc(int32_t x)
+__contract__(
+  requires(x < 20)
+  ensures(return_value == x + 1)
+);
