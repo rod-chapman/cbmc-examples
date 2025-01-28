@@ -8,16 +8,6 @@ CHECKS=--bounds-check --pointer-check \
 
 all: clean $(TARGET)
 
-# Functions that prove best with Cadical
-f1: $(FILE)_contracts.goto results_cadical
-f2: $(FILE)_contracts.goto results_cadical
-f3: $(FILE)_contracts.goto results_cadical
-arsum_blocks1: $(FILE)_contracts.goto results_cadical
-arsum_blocks2: $(FILE)_contracts.goto results_cadical
-arsum_bytes1: $(FILE)_contracts.goto results_cadical
-arsum_bytes2: $(FILE)_contracts.goto results_cadical
-assign_st1: $(FILE)_contracts.goto results_cadical
-
 # Functions that prove best with Z3
 assign_st2: $(FILE)_contracts.goto results_z3
 assign_st3: $(FILE)_contracts.goto results_z3
@@ -25,13 +15,20 @@ init_st: $(FILE)_contracts.goto results_z3
 zero_slice: $(FILE)_contracts.goto results_z3
 zero_array_ts: $(FILE)_contracts.goto results_z3
 zero_array_correct: $(FILE)_contracts.goto results_z3
+ctunpad: $(FILE)_contracts.goto results_z3
+f1: $(FILE)_contracts.goto results_z3
+f2: $(FILE)_contracts.goto results_z3
+f3: $(FILE)_contracts.goto results_z3
+arsum_blocks1: $(FILE)_contracts.goto results_z3
+arsum_blocks2: $(FILE)_contracts.goto results_z3
+arsum_bytes1: $(FILE)_contracts.goto results_z3
+arsum_bytes2: $(FILE)_contracts.goto results_z3
+assign_st1: $(FILE)_contracts.goto results_z3
 
 # Functions that prove best with Bitwuzla
 constant_time_equals_strict: $(FILE)_contracts.goto results_bitwuzla
 constant_time_equals_total: $(FILE)_contracts.goto results_bitwuzla
 ctcc: $(FILE)_contracts.goto results_bitwuzla
-ctunpad: $(FILE)_contracts.goto results_bitwuzla
-
 
 ifeq ($(strip $(TARGET)),constant_time_equals_total)
   CALLS = --replace-call-with-contract constant_time_equals_strict
@@ -41,9 +38,6 @@ else
   CALLS =
 endif
 
-
-results_cadical: $(FILE)_contracts.goto
-	cbmc --verbosity 6 $(CHECKS) --external-sat-solver cadical $<
 
 results_z3: $(FILE)_contracts.goto
 	cbmc --verbosity 6 $(CHECKS) --smt2 $<

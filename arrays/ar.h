@@ -1,142 +1,166 @@
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
 #include <limits.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
+#include "../common/cbmc.h"
 #define C 8
 
-#ifdef CBMC
-#else
-#define __CPROVER_assigns(...)
-#define __CPROVER_decreases(...)
-#define __CPROVER_assert(...)
-#define __CPROVER_requires(...)
-#define __CPROVER_ensures(...)
-#define __CPROVER_loop_invariant(...)
-#endif
+void f1(uint32_t *s)
+__contract__(
+  requires(memory_no_alias(s, C * sizeof(uint32_t)))
+  assigns(memory_slice(s, C * sizeof(uint32_t)))
+);
 
-void f1 (uint32_t *s)
-__CPROVER_requires(__CPROVER_is_fresh(s, C * sizeof(uint32_t)))
-__CPROVER_assigns(__CPROVER_object_upto(s, C * sizeof(uint32_t)));
-
-void f2 (uint32_t s[static C])
-__CPROVER_requires(__CPROVER_is_fresh(s, C * sizeof(uint32_t)))
-__CPROVER_assigns(__CPROVER_object_whole(s));
+void f2(uint32_t s[static C])
+__contract__(
+  requires(memory_no_alias(s, C * sizeof(uint32_t)))
+  assigns(object_whole(s))
+);
 
 typedef uint32_t st[C];
-void f3 (st s)
-__CPROVER_requires(__CPROVER_is_fresh(s, sizeof(st)))
-__CPROVER_assigns(__CPROVER_object_whole(s));
+void f3(st s)
+__contract__(
+  requires(memory_no_alias(s, sizeof(st)))
+  assigns(object_whole(s))
+);
 
 #define BLOCK_SIZE 4
 
 // 32-bit unsigned sum of data[0 .. num_blocks * BLOCK_SIZE - 1]
 uint32_t arsum_blocks1(const uint8_t *data, size_t num_blocks)
-__CPROVER_requires(num_blocks >= 1)
-__CPROVER_requires(num_blocks <= LONG_MAX / BLOCK_SIZE)
-__CPROVER_requires(__CPROVER_is_fresh(data, num_blocks * BLOCK_SIZE));
+__contract__(
+  requires(num_blocks >= 1)
+  requires(num_blocks <= LONG_MAX / BLOCK_SIZE)
+  requires(memory_no_alias(data, num_blocks *BLOCK_SIZE))
+);
 
 // 32-bit unsigned sum of data[0 .. num_blocks * BLOCK_SIZE - 1]
 uint32_t arsum_blocks2(const uint8_t *data, size_t num_blocks)
-__CPROVER_requires(num_blocks >= 1)
-__CPROVER_requires(num_blocks <= LONG_MAX / BLOCK_SIZE)
-__CPROVER_requires(__CPROVER_is_fresh(data, num_blocks * BLOCK_SIZE));
+__contract__(
+  requires(num_blocks >= 1) requires( num_blocks <= LONG_MAX / BLOCK_SIZE)
+  requires(memory_no_alias(data, num_blocks *BLOCK_SIZE))
+);
 
 // 32-bit unsigned sum of data[0 .. num_bytes - 1]
 uint32_t arsum_bytes1(const uint8_t *data, size_t num_bytes)
-__CPROVER_requires(num_bytes >= 1)
-__CPROVER_requires(num_bytes <= LONG_MAX)
-__CPROVER_requires(__CPROVER_is_fresh(data, num_bytes));
+__contract__(
+  requires(num_bytes >= 1)
+  requires(num_bytes <= LONG_MAX)
+  requires(memory_no_alias(data, num_bytes))
+);
 
 // 32-bit unsigned sum of data[0 .. num_bytes - 1]
 uint32_t arsum_bytes2(const uint8_t *data, size_t num_bytes)
-__CPROVER_requires(num_bytes >= 1)
-__CPROVER_requires(num_bytes <= LONG_MAX)
-__CPROVER_requires(__CPROVER_is_fresh(data, num_bytes));
+__contract__(
+  requires(num_bytes >= 1)
+  requires(num_bytes <= LONG_MAX)
+  requires(memory_no_alias(data, num_bytes))
+);
 
 // Array assignment - an abstraction of array assignment
 // with contracts that show all values copied.
-void assign_st1 (st dst, const st src)
-__CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
-__CPROVER_requires(__CPROVER_is_fresh(src, sizeof(st)))
-__CPROVER_assigns(__CPROVER_object_whole(dst))
-__CPROVER_ensures(__CPROVER_forall { size_t i; (0 <= i && i < C) ==> dst[i] == src[i] });
+void assign_st1(st dst, const st src)
+__contract__(
+  requires(memory_no_alias(dst, sizeof(st)))
+  requires(memory_no_alias(src, sizeof(st)))
+  assigns(object_whole(dst))
+  ensures(forall (i, 0, C, dst[i] == src[i]))
+);
 
-void assign_st2 (st dst, const st src)
-__CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
-__CPROVER_requires(__CPROVER_is_fresh(src, sizeof(st)))
-__CPROVER_assigns(__CPROVER_object_whole(dst))
-__CPROVER_ensures(__CPROVER_forall { size_t i; (0 <= i && i < C) ==> dst[i] == src[i] });
 
-void assign_st3 (st dst, const st src)
-__CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
-__CPROVER_requires(__CPROVER_is_fresh(src, sizeof(st)))
-__CPROVER_assigns(__CPROVER_object_whole(dst))
-__CPROVER_ensures(__CPROVER_forall { size_t i; (0 <= i && i < C) ==> dst[i] == src[i] });
+void assign_st2(st dst, const st src)
+__contract__(
+  requires(memory_no_alias(dst, sizeof(st)))
+  requires(memory_no_alias(src, sizeof(st)))
+  assigns(object_whole(dst))
+  ensures(forall(i, 0, C, dst[i] == src[i]))
+);
 
-void init_st (st dst)
-__CPROVER_requires(__CPROVER_is_fresh(dst, sizeof(st)))
-__CPROVER_assigns(__CPROVER_object_whole(dst))
-__CPROVER_ensures(__CPROVER_forall { unsigned k; (0 <= k && k < C) ==> dst[k] == 0 });
+void assign_st3(st dst, const st src)
+__contract__(
+  requires(memory_no_alias(dst, sizeof(st)))
+  requires(memory_no_alias(src, sizeof(st)))
+  assigns(object_whole(dst))
+  ensures(forall(i, 0, C, dst[i] == src[i]))
+);
 
-void zero_slice (uint8_t *dst, size_t len)
-__CPROVER_requires(__CPROVER_is_fresh(dst, len))
-__CPROVER_assigns(__CPROVER_object_upto(dst, len))
-__CPROVER_ensures(__CPROVER_forall { unsigned k; (0 <= k && k < len) ==> dst[k] == 0 });
+void init_st(st dst)
+__contract__(
+  requires(memory_no_alias(dst, sizeof(st)))
+  assigns(object_whole(dst))
+  ensures(forall(k, 0, C, dst[k] == 0))
+);
 
-void zero_array_ts (uint8_t *dst, int len)
-__CPROVER_requires(__CPROVER_is_fresh(dst, len))
-__CPROVER_assigns(__CPROVER_object_whole(dst));
+void zero_slice(uint8_t *dst, size_t len)
+__contract__(
+  requires(memory_no_alias(dst, len))
+  assigns(memory_slice(dst, len))
+  ensures(forall(k, 0, len, dst[k] == 0))
+);
 
-void zero_array_correct (uint8_t *dst, int len)
-__CPROVER_requires(__CPROVER_is_fresh(dst, len))
-__CPROVER_assigns(__CPROVER_object_whole(dst))
-__CPROVER_ensures(__CPROVER_forall { int k; (0 <= k && k < len) ==> dst[k] == 0 });
+void zero_array_ts(uint8_t *dst, unsigned len)
+__contract__(
+  requires(memory_no_alias(dst, len))
+  assigns(object_whole(dst))
+);
+
+void zero_array_correct(uint8_t *dst, unsigned len)
+__contract__(
+  requires(memory_no_alias(dst, len))
+  assigns(object_whole(dst))
+  ensures(forall(k, 0, len, dst[k] == 0))
+);
 
 
 /* Returns true if a and b are equal. Execution time may depend on len */
 /* but not on the value of the data denoted by a or b                  */
 /* Note that if len == 0, then returns true                            */
-bool constant_time_equals_strict(const uint8_t* const a,
-                                 const uint8_t* const b,
+bool constant_time_equals_strict(const uint8_t *const a, const uint8_t *const b,
                                  const uint32_t len)
-__CPROVER_requires(a != NULL && __CPROVER_is_fresh(a, len))
-__CPROVER_requires(b != NULL && __CPROVER_is_fresh(b, len))
-__CPROVER_ensures(__CPROVER_return_value == __CPROVER_forall { unsigned k; (k >= 0 && k < len) ==> (a[k] == b[k]) });
+__contract__(
+  requires(memory_no_alias(a, len))
+  requires(memory_no_alias(b, len))
+  ensures(return_value == forall(k, 0, len, a[k] == b[k]))
+);
 
 /* Returns true if a and b are equal. Execution time may depend on len */
 /* but not on the value of the data denoted by a or b                  */
 /* If either of a or b is NULL, then returns false                     */
-bool constant_time_equals_total(const uint8_t* const a,
-                                const uint8_t* const b,
+bool constant_time_equals_total(const uint8_t *const a, const uint8_t *const b,
                                 const uint32_t len)
-__CPROVER_requires(__CPROVER_is_fresh(a, len))
-__CPROVER_requires(__CPROVER_is_fresh(b, len))
-__CPROVER_ensures(((a != NULL && b != NULL) && __CPROVER_return_value == constant_time_equals_strict(a, b, len) )
-                  ||
-                  ((a == NULL || b == NULL) && __CPROVER_return_value == false)
-                 );
-// This form of postcondition using C's ternary ? : operator, but causes non-termination for Z3 and "unknown" from CVC5 with CBMC 6.0.0
-//__CPROVER_ensures(__CPROVER_return_value == ((a != NULL && b != NULL) ? constant_time_equals_strict(a, b, len) : false) );
+__contract__(
+  requires(memory_no_alias(a, len))
+  requires(memory_no_alias(b, len))
+  ensures(((a != NULL && b != NULL) &&
+          return_value == constant_time_equals_strict(a, b, len)) ||
+          ((a == NULL || b == NULL) && return_value == false))
+);
+// This form of postcondition using C's ternary ? : operator, but causes
+// non-termination for Z3 and "unknown" from CVC5 with CBMC 6.0.0
+// ensures(return_value == ((a != NULL && b != NULL) ?
+// constant_time_equals_strict(a, b, len) : false) );
 
 
 
 /* Constant Time Condition Copy */
-int ctcc(uint8_t* dst, const uint8_t* src, uint32_t len, uint8_t dont)
-__CPROVER_requires(dst != NULL && __CPROVER_is_fresh(dst, len))
-__CPROVER_requires(src != NULL && __CPROVER_is_fresh(src, len))
-__CPROVER_assigns(__CPROVER_object_whole(dst))
-__CPROVER_ensures(__CPROVER_return_value == 0)
-__CPROVER_ensures(dont > 0 ?
-                  (__CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (dst [i] == __CPROVER_old(dst)[i]) } )
-                  :
-                  (__CPROVER_forall { size_t i; (i >= 0 && i < len) ==> (dst [i] == src [i]) } ));
+int ctcc(uint8_t *dst, const uint8_t *src, uint32_t len, uint8_t dont)
+__contract__(
+  requires(memory_no_alias(dst, len))
+  requires(memory_no_alias(src, len))
+  assigns(object_whole(dst))
+  ensures(return_value == 0)
+  ensures(dont > 0 ? (forall(i, 0, len, dst[i] == old(dst)[i]))
+                   : (forall(i, 0, len, dst[i] == src[i])))
+);
 
 /* Constant time conditional unpad */
-int ctunpad(uint8_t* dst, const uint8_t* src, uint32_t srclen, uint32_t dstlen)
-__CPROVER_requires(dst != NULL && __CPROVER_is_fresh(dst, dstlen))
-__CPROVER_requires(src != NULL && __CPROVER_is_fresh(src, srclen))
-__CPROVER_requires(srclen > dstlen)
-__CPROVER_requires(srclen - dstlen >= 3)
-__CPROVER_assigns(__CPROVER_object_whole(dst))
-__CPROVER_ensures(__CPROVER_return_value == 0);
+int ctunpad(uint8_t *dst, const uint8_t *src, uint32_t srclen, uint32_t dstlen)
+__contract__(
+  requires(memory_no_alias(dst, dstlen))
+  requires(memory_no_alias(src, srclen))
+  requires(srclen > dstlen)
+  requires(srclen - dstlen >= 3)
+  assigns(object_whole(dst))
+  ensures(return_value == 0)
+);
