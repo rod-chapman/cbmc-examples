@@ -5,7 +5,32 @@
 // truncated square root of 2**31-1
 #define INT32_ROOT_MAX 46340
 
-int32_t isqrt(int32_t x)
+int32_t isqrt_ts(int32_t x)
+__contract__(
+  requires(x >= 0)
+  ensures(0 <= return_value)
+  ensures(return_value <= INT32_ROOT_MAX)
+)
+{
+  int32_t upper, lower, middle;
+  lower = 0;
+  upper = INT32_ROOT_MAX + 1;
+  while (lower + 1 != upper)
+  __loop__(
+    invariant(0 <= lower && lower <= INT32_ROOT_MAX)
+    invariant(0 <= upper && upper <= (INT32_ROOT_MAX + 1))
+  )
+  {
+    middle = (lower + upper) / 2;
+    if ((middle * middle) > x)
+      upper = middle;
+    else
+      lower = middle;
+  }
+  return lower;
+}
+
+int32_t isqrt_correct(int32_t x)
 __contract__(
   requires(x >= 0)
   ensures(0 <= return_value)
@@ -37,8 +62,14 @@ __contract__(
   return lower;
 }
 
-void isqrt_harness()
+void isqrt_ts_harness()
 {
   int32_t x, y;
-  y = isqrt(x);
+  y = isqrt_ts(x);
+}
+
+void isqrt_correct_harness()
+{
+  int32_t x, y;
+  y = isqrt_correct(x);
 }

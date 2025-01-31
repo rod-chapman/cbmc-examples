@@ -48,9 +48,7 @@ uint32_t arsum_blocks1(const uint8_t *data, size_t num_blocks)
   uint32_t sum = 0;
   for (size_t current_block = 0; current_block < num_blocks; current_block++)
   __loop__(
-      assigns(sum, current_block)
       invariant(current_block <= num_blocks)
-      decreases(num_blocks - current_block)
     )
   {
     size_t block_base = current_block * BLOCK_SIZE;
@@ -78,10 +76,8 @@ uint32_t arsum_blocks2(const uint8_t *data, size_t num_blocks)
 
   for (; blocks_to_go >= 1; blocks_to_go--)
   __loop__(
-    assigns(blocks_to_go, sum, current_byte_ptr)
     invariant(blocks_to_go <= num_blocks)
     invariant(current_byte_ptr == (data + (num_blocks - blocks_to_go) * BLOCK_SIZE))
-    decreases(blocks_to_go)
   )
   {
 #pragma CPROVER check push
@@ -106,9 +102,7 @@ uint32_t arsum_bytes1(const uint8_t *data, size_t num_bytes)
   uint32_t sum = 0;
   for (size_t idx = 0; idx < num_bytes; idx++)
   __loop__(
-    assigns(idx, sum)
     invariant(idx <= num_bytes)
-    decreases(num_bytes - idx)
   )
   {
 #pragma CPROVER check push
@@ -128,10 +122,8 @@ uint32_t arsum_bytes2(const uint8_t *data, size_t num_bytes)
   size_t bytes_to_go = num_bytes;
   for (; bytes_to_go >= 1; bytes_to_go--)
   __loop__(
-    assigns(bytes_to_go, sum, current_byte_ptr)
     invariant(bytes_to_go <= num_bytes)
     invariant(current_byte_ptr == (data + (num_bytes - bytes_to_go)))
-    decreases(bytes_to_go)
   )
   {
 #pragma CPROVER check push
@@ -163,10 +155,8 @@ void assign_st2(st dst, const st src)
 {
   for (size_t i = 0; i < C; i++)
   __loop__(
-    assigns(i, object_whole(dst))
     invariant(i <= C)
     invariant(forall(j, 0, i, dst[j] == src[j]))
-    decreases(C - i)
   )
   {
     dst[i] = src[i];
@@ -184,10 +174,8 @@ void init_st(st dst)
   size_t i;
   for (i = 0; i < C; i++)
   __loop__(
-    assigns(i, object_whole(dst))
     invariant(i <= C)
     invariant(forall(j, 0, i, dst[j] == 0))
-    decreases(C - i)
   )
   {
     dst[i] = 0;
@@ -199,10 +187,9 @@ void zero_slice(uint8_t *dst, size_t len)
   size_t i;
   for (i = 0; i < len; i++)
   __loop__(
-    assigns(i, memory_slice(dst, len))
+    assigns(i, memory_slice(dst, len)) // Needed for speed of verification
     invariant(i <= len)
     invariant(forall(j, 0, i, dst[j] == 0))
-    decreases(len - i)
   )
   {
     dst[i] = 0;
@@ -213,9 +200,7 @@ void zero_array_ts(uint8_t *dst, unsigned len)
 {
   for (unsigned i = 0; i < len; i++)
   __loop__(
-    assigns(i, object_whole(dst))
     invariant(i <= len)
-    decreases(len - i)
   )
   {
     dst[i] = 0;
@@ -226,10 +211,8 @@ void zero_array_correct(uint8_t *dst, unsigned len)
 {
   for (unsigned i = 0; i < len; i++)
   __loop__(
-    assigns(i, object_whole(dst))
     invariant(i <= len)
     invariant(forall(j, 0, i, dst[j] == 0))
-    decreases(len - i)
   )
   {
     dst[i] = 0;
@@ -245,10 +228,8 @@ bool constant_time_equals_strict(const uint8_t *const a, const uint8_t *const b,
   /* iterate over each byte in the slices */
   for (uint32_t i = 0; i < len; i++)
   __loop__(
-    assigns(i, arrays_equal)
     invariant(i <= len)
     invariant(arrays_equal == forall(j, 0, i, a[j] == b[j]))
-    decreases(len - i)
   )
   {
     arrays_equal = arrays_equal && (a[i] == b[i]);
@@ -281,10 +262,8 @@ int ctcc(uint8_t *dst, const uint8_t *src, uint32_t len, uint8_t dont)
 
   for (size_t i = 0; i < len; i++)
   __loop__(
-    assigns(i, object_whole(dst))
     invariant(i <= len)
     invariant(forall(j, 0, i, dst[j] == (dont == 0 ? src[j] : loop_entry(dst)[j])))
-    decreases(len - i)
   )
   {
     uint8_t old = dst[i];
@@ -306,11 +285,13 @@ int ctunpad(uint8_t *dst, const uint8_t *src, uint32_t srclen, uint32_t dstlen)
   dont_copy = dont_copy | src[zero_byte_index];
 
   for (size_t i = first_padding_byte_index; i < zero_byte_index; i++)
-    assigns(i, dont_copy) invariant(i <= zero_byte_index)
-        invariant(zero_byte_index < srclen) decreases(zero_byte_index - i)
-    {
-      dont_copy = dont_copy | src[i];
-    }
+  __loop__(
+    invariant(i <= zero_byte_index)
+    invariant(zero_byte_index < srclen)
+  )
+  {
+    dont_copy = dont_copy | src[i];
+  }
 
   return ctcc(dst, &src[first_data_byte_index], dstlen, dont_copy);
 }

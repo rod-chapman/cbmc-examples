@@ -1,4 +1,4 @@
-TARGET=isqrt
+TARGET=isqrt_correct
 FILE=isqrt
 
 all: $(TARGET)
