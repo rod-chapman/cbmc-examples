@@ -16,10 +16,15 @@
  *
  * Returns r.
  **************************************************/
+#define REDUCE_DOMAIN_MAX 2143289343
+#define REDUCE_RANGE_MAX 6283009
 int32_t ml_dsa_reduce32(int32_t a)
 __contract__(
-  requires(true) /* TBD */
-  ensures(true)  /* TBD */
+  requires(a <= REDUCE_DOMAIN_MAX)
+  ensures(return_value >= -REDUCE_RANGE_MAX)
+  ensures(return_value < REDUCE_RANGE_MAX)
+  // Extra credit for proof of:
+  // ensures(return_value == a % ML_DSA_Q)
 );
 
 /*************************************************
@@ -34,8 +39,12 @@ __contract__(
  **************************************************/
 int32_t ml_dsa_caddq(int32_t a)
 __contract__(
-  requires(true) /* TBD */
-  ensures(true)  /* TBD */
+  requires(a > -ML_DSA_Q)
+  requires(a < ML_DSA_Q)
+  ensures(return_value >= 0)
+  ensures(return_value < ML_DSA_Q)
+  // Extra credit for partial correctness:
+  ensures(return_value == (a >= 0) ? a : (a + ML_DSA_Q))
 );
 
 /*************************************************
@@ -51,8 +60,9 @@ __contract__(
  **************************************************/
 int32_t ml_dsa_freeze(int32_t a)
 __contract__(
-  requires(true) /* TBD */
-  ensures(true)  /* TBD */
+  requires(a <= REDUCE_DOMAIN_MAX)
+  ensures(return_value >= 0)
+  ensures(return_value < ML_DSA_Q)
 );
 
 /*************************************************
@@ -69,17 +79,24 @@ __contract__(
  **************************************************/
 int64_t ml_dsa_fqmul(int32_t a, int32_t b)
 __contract__(
-  requires(true) /* TBD */
-  ensures(true)  /* TBD */
+  requires(((int64_t) a * (int64_t)b) <= (2147483648UL * (int64_t) ML_DSA_Q))
+  requires(((int64_t) a * (int64_t)b) >= (2147483648UL * (int64_t) -ML_DSA_Q))
+  ensures(return_value > -ML_DSA_Q)
+  ensures(return_value < ML_DSA_Q)
 );
 
 #define N 256
 void poly_freeze(int32_t p[N])
 __contract__(
   requires(memory_no_alias(p, sizeof(int32_t) * N))
+
+  /* To meet the precondition of ml_dsa_freeze() we need to know that */
+  requires(array_bound(p, 0, N, 0, (REDUCE_DOMAIN_MAX + 1)))
+
   assigns(object_whole(p))
+
   /* use the array_bound() macro to express that all elements p are frozen to 0 <= [[i] < Q */
-  ensures(true) /* TBD */
+  ensures(array_bound(p, 0, N, 0, ML_DSA_Q))
 );
 
 #endif

@@ -44,6 +44,8 @@ void poly_freeze(int32_t p[N])
   for (i = 0; i < N; i++)
   __loop__(
     invariant(i <= N)
+    invariant(array_bound(p, 0, i, 0, ML_DSA_Q))
+    invariant(array_bound(p, i, N, 0, (REDUCE_DOMAIN_MAX + 1)))
   )
   {
     p[i] = ml_dsa_freeze(p[i]);
