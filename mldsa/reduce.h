@@ -73,5 +73,13 @@ __contract__(
   ensures(true)  /* TBD */
 );
 
+#define N 256
+void poly_freeze(int32_t p[N])
+__contract__(
+  requires(memory_no_alias(p, sizeof(int32_t) * N))
+  assigns(object_whole(p))
+  /* use the array_bound() macro to express that all elements p are frozen to 0 <= [[i] < Q */
+  ensures(true) /* TBD */
+);
 
 #endif

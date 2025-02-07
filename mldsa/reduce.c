@@ -37,3 +37,15 @@ int64_t ml_dsa_fqmul(int32_t a, int32_t b)
   t = (s - (int64_t)t * ML_DSA_Q) >> 32;
   return t;
 }
+
+void poly_freeze(int32_t p[N])
+{
+  unsigned i;
+  for (i = 0; i < N; i++)
+  __loop__(
+    invariant(i <= N)
+  )
+  {
+    p[i] = ml_dsa_freeze(p[i]);
+  }
+}
