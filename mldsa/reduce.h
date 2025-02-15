@@ -1,6 +1,7 @@
 #ifndef ML_DSA_REDUCE_H
 #define ML_DSA_REDUCE_H
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "../common/cbmc.h"
@@ -16,15 +17,19 @@
  *
  * Returns r.
  **************************************************/
-#define REDUCE_DOMAIN_MAX 2143289343
+#define REDUCE_DOMAIN_MAX (INT32_MAX - (1 << 22))
 #define REDUCE_RANGE_MAX 6283009
 int32_t ml_dsa_reduce32(int32_t a)
 __contract__(
   requires(a <= REDUCE_DOMAIN_MAX)
+  // Type safety as per comments above
   ensures(return_value >= -REDUCE_RANGE_MAX)
-  ensures(return_value < REDUCE_RANGE_MAX)
-  // Extra credit for proof of:
-  // ensures(return_value == a % ML_DSA_Q)
+  ensures(return_value <   REDUCE_RANGE_MAX)
+  // Extra credit: Returned value is congruent to to a % ML_DSA_Q, either
+  // "just right" or too big or too small by 1*ML_DSA_Q
+  ensures((return_value == (a % ML_DSA_Q)) ||
+          (return_value == (a % ML_DSA_Q + ML_DSA_Q)) ||
+          (return_value == (a % ML_DSA_Q - ML_DSA_Q)))
 );
 
 /*************************************************
@@ -69,8 +74,8 @@ __contract__(
  * Name:        ml_dsa_fqmul
  *
  * Description: Multiplication followed by Montgomery reduction
- *              For finite field element a with -2^{31}Q <= a <= Q*2^31,
- *              compute r \equiv a*2^{-32} (mod Q) such that -Q < r < Q.
+ *              For finite field element a with -2^{31}Q <= (a * b) <= Q*2^31,
+ *              compute r \equiv (a*b)*2^{-32} (mod Q) such that -Q < r < Q.
  *
  * Arguments:   - int32_t a: first factor
  *              - int32_t b: second factor
