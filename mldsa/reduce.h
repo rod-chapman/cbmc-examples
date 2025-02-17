@@ -10,8 +10,14 @@
 /*************************************************
  * Name:        ml_dsa_reduce32
  *
- * Description: For finite field element a with a <= 2^{31} - 2^{22} - 1,
- *              compute r \equiv a (mod Q) such that -6283009 <= r <= 6283008.
+ * Description: For finite field element a with a <= 2**31 - 2**22 - 1,
+ *              (where "**" means exponentiation),
+ *              computes r which is congruent to a (mod Q) AND
+ *              such that -6283009 <= r < 6283009.
+ *
+ *              The returned result r is an approximation to the C
+ *              expression (a % ML_DSA_Q) but might be "too big" or
+ *              "too small" by exactly ML_DSA_Q
  *
  * Arguments:   - int32_t: finite field element a
  *
@@ -35,7 +41,7 @@ __contract__(
 /*************************************************
  * Name:        ml_dsa_caddq
  *
- * Description: Add Q if input coefficient is negative.
+ * Description: Add ML_DSA_Q if input coefficient is negative.
  *
  * Arguments:   - int32_t: finite field element a such
  *              that a > -ML_DSA_Q && a < ML_DSA_Q
@@ -55,9 +61,9 @@ __contract__(
 /*************************************************
  * Name:        ml_dsa_freeze
  *
- * Description: For finite field element a, compute standard
- *              representative r = a mod^+ Q such that
- *              r >= 0 && r < Q
+ * Description: For finite field element a with a <= REDUCE_DOMAIN_MAX,
+ *              compute standard representation r = a mod ML_DSA_Q such that
+ *              r >= 0 && r < ML_DSA_Q
  *
  * Arguments:   - int32_t: finite field element a
  *
@@ -74,8 +80,10 @@ __contract__(
  * Name:        ml_dsa_fqmul
  *
  * Description: Multiplication followed by Montgomery reduction
- *              For finite field element a with -2^{31}Q <= (a * b) <= Q*2^31,
- *              compute r \equiv (a*b)*2^{-32} (mod Q) such that -Q < r < Q.
+ *              For finite field element a and b such that
+ *              ML_DSA_Q*(-2**31) <= (a * b) <= ML_DSA_Q*(2**31),
+ *              compute r congruent to (a*b)*2**(-32) (mod ML_DSA_Q)
+ *              such that -ML_DSA_Q < r < ML_DSA_Q.
  *
  * Arguments:   - int32_t a: first factor
  *              - int32_t b: second factor
@@ -84,12 +92,23 @@ __contract__(
  **************************************************/
 int64_t ml_dsa_fqmul(int32_t a, int32_t b)
 __contract__(
-  requires(((int64_t) a * (int64_t)b) <= (2147483648UL * (int64_t) ML_DSA_Q))
-  requires(((int64_t) a * (int64_t)b) >= (2147483648UL * (int64_t) -ML_DSA_Q))
+  requires(((int64_t) a * (int64_t)b) <= (2147483648LL * (int64_t) ML_DSA_Q))
+  requires(((int64_t) a * (int64_t)b) >= (2147483648LL * (int64_t) -ML_DSA_Q))
   ensures(return_value > -ML_DSA_Q)
   ensures(return_value < ML_DSA_Q)
 );
 
+/*************************************************
+ * Name:        poly_freeze
+ *
+ * Description: Freezes all elements of array p
+ *              such that for all i
+ *               0 <= p[i] < ML_DSA_Q
+ *
+ * This example illustrates the use of array_bound
+ * macro for CBMC, and loop invariant contracts
+ * in the body
+ **************************************************/
 #define N 256
 void poly_freeze(int32_t p[N])
 __contract__(
@@ -100,7 +119,8 @@ __contract__(
 
   assigns(object_whole(p))
 
-  /* use the array_bound() macro to express that all elements p are frozen to 0 <= [[i] < Q */
+  /* use the array_bound() macro to express that all elements p are
+   * frozen to 0 <= p[i] < ML_DSA_Q */
   ensures(array_bound(p, 0, N, 0, ML_DSA_Q))
 );
 
