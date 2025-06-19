@@ -135,6 +135,21 @@ uint32_t arsum_bytes2(const uint8_t *data, size_t num_bytes)
   return sum;
 }
 
+int32_t arsum_swords(const int32_t *data, const int32_t datalen)
+{
+  int32_t sum = 0;
+
+  for (int32_t idx = 0; idx < datalen; idx++)
+  __loop__(
+    invariant(idx >= 0 && idx <= datalen)
+    invariant(sum >= idx * DATA_MIN) // Lower bound on sum in terms of idx
+    invariant(sum <= idx * DATA_MAX) // Upper bound on sum in terms of idx
+  )
+  {
+    sum += data[idx];
+  }
+  return sum;
+}
 
 
 // Array assignment - element by element copy
@@ -350,6 +365,14 @@ void arsum_bytes2_harness()
   uint32_t r;
   size_t n;
   r = arsum_bytes2(d, n);
+}
+
+void arsum_swords_harness()
+{
+  int32_t *d;
+  int32_t r;
+  int32_t n;
+  r = arsum_swords(d, n);
 }
 
 void assign_st1_harness()

@@ -58,6 +58,21 @@ __contract__(
   requires(memory_no_alias(data, num_bytes))
 );
 
+#define LEN_MAX 100
+#define DATA_MIN -9
+#define DATA_MAX 9
+// 32-bit signed sum of signed 32-bit data[0 .. datalen - 1]
+// with limits on the range of the data and length of the array
+int32_t arsum_swords(const int32_t *data, const int32_t datalen)
+__contract__(
+  requires(datalen >= 1)
+  requires(datalen <= LEN_MAX)
+  requires(memory_no_alias(data, datalen * sizeof(int32_t)))
+  requires(forall(k, 0, datalen, data[k] >= DATA_MIN && data[k] <= DATA_MAX))
+  ensures(return_value >= LEN_MAX * DATA_MIN && return_value <= LEN_MAX * DATA_MAX)
+);
+
+
 // Array assignment - an abstraction of array assignment
 // with contracts that show all values copied.
 void assign_st1(st dst, const st src)

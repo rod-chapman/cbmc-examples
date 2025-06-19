@@ -23,6 +23,7 @@ arsum_blocks1: $(FILE)_contracts.goto results_z3
 arsum_blocks2: $(FILE)_contracts.goto results_z3
 arsum_bytes1: $(FILE)_contracts.goto results_z3
 arsum_bytes2: $(FILE)_contracts.goto results_z3
+arsum_swords: $(FILE)_contracts.goto results_bitwuzla
 assign_st1: $(FILE)_contracts.goto results_z3
 
 # Functions that prove best with Bitwuzla
