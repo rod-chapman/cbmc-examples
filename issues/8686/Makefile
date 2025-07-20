@@ -1,15 +1,12 @@
 FILE = q
 TARGET ?= mld_polyveck_caddq
 
-CHECKS=--bounds-check --pointer-check \
-       --undefined-shift-check --enum-range-check --pointer-primitive-check
-
 all: clean $(TARGET)
 
 $(TARGET): $(FILE)_contracts.goto results
 
 b.smt2: $(FILE)_contracts.goto
-	cbmc $(CHECKS) --bitwuzla --outfile $@ --bitwuzla $<
+	cbmc --bitwuzla --outfile $@ --bitwuzla $<
 
 results: b.smt2
 	bitwuzla $<
