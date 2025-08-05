@@ -191,7 +191,7 @@ __contract__(
   requires(memory_no_alias(v, sizeof(vector)))
   requires(forall(i0, 0, LC, v[i0] < INT32_MAX))
   assigns(object_whole(v))
-  ensures(forall(i1, 0, LC, old(v)[i1] < INT32_MAX && v[i1] == old(v)[i1] + 1))
+  ensures(forall(i1, 0, LC, v[i1] == old(* (vector *)v)[i1] + 1))
 );
 
 void inc_matrix(matrix m)

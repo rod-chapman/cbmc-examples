@@ -318,8 +318,8 @@ void inc_vector(vector v)
   __loop__(
     assigns(i, object_whole(v))
     invariant(i <= LC)
-    invariant(forall(j1, i, LC, v[j1] < INT32_MAX))
-    invariant(forall(j2, 0, i, v[j2] == loop_entry(v)[j2] + 1))
+    invariant(forall(j2, i, LC, v[j2] == loop_entry(* (vector *)v)[j2]))
+    invariant(forall(j3, 0,  i, v[j3] == loop_entry(* (vector *)v)[j3] + 1))
   )
   {
     v[i]++;
