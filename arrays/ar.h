@@ -201,5 +201,5 @@ __contract__(
                   forall(j, 0, LC, m[i][j] < INT32_MAX)))
   assigns(object_whole(m))
   ensures(forall(i, 0, LC,
-                 forall(j, 0, LC, m[i][j] == old(m)[i][j] + 1)))
+                 forall(j, 0, LC, m[i][j] == old(* (matrix *)m)[i][j] + 1)))
 );

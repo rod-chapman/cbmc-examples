@@ -327,6 +327,22 @@ void inc_vector(vector v)
 }
 
 
+void inc_matrix(matrix m)
+{
+  for (unsigned i = 0; i < LC; i++)
+  __loop__(
+    assigns(i, object_whole(m))
+    invariant(i <= LC)
+    invariant(forall(j0, i, LC,
+                     forall(k0, 0, LC, m[j0][k0] == loop_entry(* (matrix *)m)[j0][k0])))
+    invariant(forall(j1, 0, i,
+                     forall(k1, 0, LC, m[j1][k1] == loop_entry(* (matrix *)m)[j1][k1] + 1)))
+  )
+  {
+    inc_vector(m[i]);
+  }
+}
+
 
 /////////////
 // HARNESSES
@@ -488,4 +504,10 @@ void inc_vector_harness()
 {
   int32_t *v;
   inc_vector(v);
+}
+
+void inc_matrix_harness()
+{
+  int32_t *m;
+  inc_matrix(m);
 }
