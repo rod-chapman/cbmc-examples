@@ -179,3 +179,27 @@ __contract__(
   assigns(object_whole(dst))
   ensures(return_value == 0)
 );
+
+/* New example/challenge for Kani */
+#define LC 256
+
+typedef int32_t vector[LC];
+typedef vector matrix[LC];
+
+void inc_vector(vector v)
+__contract__(
+  requires(memory_no_alias(v, sizeof(vector)))
+  requires(forall(i0, 0, LC, v[i0] < INT32_MAX))
+  assigns(object_whole(v))
+  ensures(forall(i1, 0, LC, old(v)[i1] < INT32_MAX && v[i1] == old(v)[i1] + 1))
+);
+
+void inc_matrix(matrix m)
+__contract__(
+  requires(memory_no_alias(m, sizeof(matrix)))
+  requires(forall(i, 0, LC,
+                  forall(j, 0, LC, m[i][j] < INT32_MAX)))
+  assigns(object_whole(m))
+  ensures(forall(i, 0, LC,
+                 forall(j, 0, LC, m[i][j] == old(m)[i][j] + 1)))
+);

@@ -312,6 +312,21 @@ int ctunpad(uint8_t *dst, const uint8_t *src, uint32_t srclen, uint32_t dstlen)
 }
 
 
+void inc_vector(vector v)
+{
+  for (unsigned i = 0; i < LC; i++)
+  __loop__(
+    assigns(i, object_whole(v))
+    invariant(i <= LC)
+    invariant(forall(j1, i, LC, v[j1] < INT32_MAX))
+    invariant(forall(j2, 0, i, v[j2] == loop_entry(v)[j2] + 1))
+  )
+  {
+    v[i]++;
+  }
+}
+
+
 
 /////////////
 // HARNESSES
@@ -467,4 +482,10 @@ void ctunpad_harness()
   uint32_t dstlen;
   int result;
   result = ctunpad(dst, src, srclen, dstlen);
+}
+
+void inc_vector_harness()
+{
+  int32_t *v;
+  inc_vector(v);
 }
