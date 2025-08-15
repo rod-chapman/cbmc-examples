@@ -343,6 +343,20 @@ void inc_matrix(matrix m)
   }
 }
 
+int condmod(int16_t v[256])
+{
+  if (v[0] > 3)
+  {
+    // Bounds on v increase by 1
+    v[0] += 1;
+    return 0;
+  }
+  else
+  {
+    // v[] is left unmodified
+    return -1;
+  }
+}
 
 /////////////
 // HARNESSES
@@ -512,15 +526,9 @@ void inc_matrix_harness()
   inc_matrix(m);
 }
 
-int condmod(int16_t v[256])
+void condmod_harness()
 {
-  if (v[0] > 3)
-  {
-    v[0] += 1;
-    return 0;
-  }
-  else
-  {
-    return -1;
-  }
+  int16_t *v;
+  int r;
+  r = condmod(v);
 }

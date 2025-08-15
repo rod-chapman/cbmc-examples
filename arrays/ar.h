@@ -210,6 +210,11 @@ __contract__(
   requires(array_abs_bound(v, 0, 256, 10))
   assigns(object_whole(v))
   ensures(return_value == -1 || return_value == 0)
+
+  // Success - Bounds on v increase by 1
   ensures((return_value == 0)  ==> array_abs_bound(v, 0, 256, 11))
+
+  // Failure case - bounds on v are unchanged and VALUES of v are unchanged
   ensures((return_value == -1) ==> array_abs_bound(v, 0, 256, 10))
-)
+  ensures((return_value == -1) ==> forall(k, 0, 256, v[k] == old(* (int16_t (*)[256])v)[k]))
+);
