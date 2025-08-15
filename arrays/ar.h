@@ -203,3 +203,13 @@ __contract__(
   ensures(forall(i, 0, LC,
                  forall(j, 0, LC, m[i][j] == old(* (matrix *)m)[i][j] + 1)))
 );
+
+int condmod(int16_t v[256])
+__contract__(
+  requires(memory_no_alias(v, 256 * sizeof(int16_t)))
+  requires(array_abs_bound(v, 0, 256, 10))
+  assigns(object_whole(v))
+  ensures(return_value == -1 || return_value == 0)
+  ensures((return_value == 0)  ==> array_abs_bound(v, 0, 256, 11))
+  ensures((return_value == -1) ==> array_abs_bound(v, 0, 256, 10))
+)

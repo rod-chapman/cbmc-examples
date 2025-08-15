@@ -511,3 +511,16 @@ void inc_matrix_harness()
   int32_t *m;
   inc_matrix(m);
 }
+
+int condmod(int16_t v[256])
+{
+  if (v[0] > 3)
+  {
+    v[0] += 1;
+    return 0;
+  }
+  else
+  {
+    return -1;
+  }
+}

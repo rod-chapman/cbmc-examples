@@ -27,6 +27,7 @@ arsum_swords: $(FILE)_contracts.goto results_bitwuzla
 assign_st1: $(FILE)_contracts.goto results_z3
 inc_vector: $(FILE)_contracts.goto results_z3
 inc_matrix: $(FILE)_contracts.goto results_z3b
+condmod: $(FILE)_contracts.goto results_z3
 
 # Functions that prove best with Bitwuzla
 constant_time_equals_strict: $(FILE)_contracts.goto results_bitwuzla
