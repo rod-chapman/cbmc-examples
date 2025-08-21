@@ -26,7 +26,7 @@ arsum_bytes2: $(FILE)_contracts.goto results_z3
 arsum_swords: $(FILE)_contracts.goto results_bitwuzla
 assign_st1: $(FILE)_contracts.goto results_z3
 inc_vector: $(FILE)_contracts.goto results_z3
-inc_matrix: $(FILE)_contracts.goto results_z3b
+inc_matrix: $(FILE)_contracts.goto results_b2
 condmod: $(FILE)_contracts.goto results_bitwuzla
 
 # Functions that prove best with Bitwuzla
@@ -38,6 +38,8 @@ ifeq ($(strip $(TARGET)),constant_time_equals_total)
   CALLS = --replace-call-with-contract constant_time_equals_strict
 else ifeq ($(strip $(TARGET)),ctunpad)
   CALLS = --replace-call-with-contract ctcc
+else ifeq ($(strip $(TARGET)),inc_matrix)
+  CALLS = --replace-call-with-contract inc_vector
 else
   CALLS =
 endif
@@ -48,6 +50,9 @@ results_z3: $(FILE)_contracts.goto
 
 results_z3b: $(FILE)_contracts.goto
 	cbmc --verbosity 6 $(CHECKS) --smt2 --slice-formula --no-array-field-sensitivity --outfile z.smt2 --z3 $<
+
+results_b2: $(FILE)_contracts.goto
+	cbmc --verbosity 6 $(CHECKS) --bitwuzla --slice-formula --no-array-field-sensitivity --outfile b.smt2 --bitwuzla $<
 
 results_bitwuzla: $(FILE)_contracts.goto
 	cbmc --verbosity 6 $(CHECKS) --bitwuzla $<
